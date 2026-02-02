@@ -1,0 +1,9 @@
+[submodule "libs/butano"]
+	path = libs/butano
+	url = https://github.com/GValiente/butano.git
+[submodule "libs/iso-butano"]
+	path = libs/iso-butano
+	url = https://github.com/copyrat90/iso-butano.git
+[submodule "libs/gba-kor-fonts"]
+	path = libs/gba-kor-fonts
+	url = https://github.com/copyrat90/gba-kor-fonts.git

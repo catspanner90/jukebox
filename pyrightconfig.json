@@ -1,0 +1,6 @@
+{
+    "typeCheckingMode": "strict",
+    "ignore": [
+        "gba-kor-fonts/tools/butano/*.py"
+    ]
+}
