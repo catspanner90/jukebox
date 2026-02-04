@@ -28,10 +28,17 @@ public:
     bool load();
     void save();
 
+public:
+    unsigned tune_index() const;
+    void set_tune_index(unsigned index);
+
 public: // `sram_rw` uses these to save/load
     void measure(ibn::bit_stream_measurer& measurer) const;
     void write(ibn::bit_stream_writer& writer) const;
     void read(ibn::bit_stream_reader& reader);
+
+private:
+    unsigned _tune_index;
 };
 
 } // namespace jb::sys

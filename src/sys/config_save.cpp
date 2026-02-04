@@ -26,6 +26,7 @@ config_save::config_save()
 
 void config_save::reset()
 {
+    _tune_index = 0;
 }
 
 bool config_save::load()
@@ -48,21 +49,37 @@ void config_save::save()
     rw.write(*this);
 }
 
+unsigned config_save::tune_index() const
+{
+    return _tune_index;
+}
+
+void config_save::set_tune_index(unsigned index)
+{
+    _tune_index = index;
+}
+
 void config_save::measure(ibn::bit_stream_measurer& measurer) const
 {
-    measurer.write(FOOTER); // footer: 32 bits
+    measurer
+        .write(_tune_index) // 32 bits
+        .write(FOOTER);     // footer: 32 bits
 }
 
 void config_save::write(ibn::bit_stream_writer& writer) const
 {
-    writer.write(FOOTER); // footer: 32 bits
+    writer
+        .write(_tune_index) // 32 bits
+        .write(FOOTER);     // footer: 32 bits
 }
 
 void config_save::read(ibn::bit_stream_reader& reader)
 {
     std::uint32_t footer = 0;
 
-    reader.read(footer); // footer: 32 bits
+    reader
+        .read(_tune_index) // 32 bits
+        .read(footer);     // footer: 32 bits
 
     if (footer != FOOTER)
         reader.set_fail();

@@ -30,6 +30,15 @@ private:
     };
 
 private:
+    void play_at_cursor();
+    void pause_or_resume();
+    void stop();
+
+private:
+    unsigned cursor_index();
+    void set_cursor_index(unsigned index);
+
+private:
     void redraw_thumbnail_bg();
 
     void redraw_tune_head_texts();
@@ -42,6 +51,8 @@ private:
 
 private:
     state _state = state::TUNE_LIST;
+
+    bn::optional<unsigned> _playing_index;
 
     bn::optional<bn::dp_direct_bitmap_bg_painter> _bg_painter;
 
