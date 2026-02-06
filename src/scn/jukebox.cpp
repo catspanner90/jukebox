@@ -258,9 +258,12 @@ void jukebox::redraw_tune_head_texts()
 
     if (!info.remixer_name().empty())
     {
-        // " (Remixed by "
-        generated = small_text_gen.generate_top_left_optional(text_pos, " (Remixed by ", _tune_head_text_sprites);
-        text_pos.set_x(text_pos.x() + small_text_gen.width(" (Remixed by "));
+        // " (Covered by " / " (Transcribed by "
+        const bn::string_view remix_text = info.category() == tune_info::category::COVER        ? " (Covered by "
+                                           : info.category() == tune_info::category::TRANSCRIBE ? " (Transcribed by "
+                                                                                                : " (Edited by ";
+        generated = small_text_gen.generate_top_left_optional(text_pos, remix_text, _tune_head_text_sprites);
+        text_pos.set_x(text_pos.x() + small_text_gen.width(remix_text));
 
         // "remixer name"
         generated = small_text_gen.generate_top_left_optional(text_pos, info.remixer_name(), _tune_head_text_sprites);

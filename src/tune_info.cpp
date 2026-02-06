@@ -17,16 +17,18 @@ namespace
 {
 
 constexpr tune_info TUNES_LIST_RAW[] = {
-    tune_info(bn::dmg_music_items::hell_owo_rld, true, nullptr, "hellOWOrld", "copyrat90", {},
+    tune_info(bn::dmg_music_items::hell_owo_rld, tune_info::category::ORIGINAL, true, nullptr, "hellOWOrld",
+              "copyrat90", {},
               R"(First loop I wrote in FamiTracker years ago, later converted into hUGETracker format.
 
 Mostly inspired by Kitsune^2 - Naradno, Pachelbel - Canon in D and few other songs.)"),
-    tune_info(bn::dmg_music_items::puku_7, true, nullptr, "ぷくぷく天然かいらんばん - BGM #07", "さかもと ひでき",
-              "copyrat90",
+    tune_info(bn::dmg_music_items::puku_7, tune_info::category::TRANSCRIBE, true, nullptr,
+              "ぷくぷく天然かいらんばん - BGM #07", "さかもと ひでき", "copyrat90",
               R"(Ported a song from ぷくぷく天然かいらんばん just to practice using Furnace Tracker.
 
 Original song also has PCM channels, but unfortunately, they're missing in this port.)"),
-    tune_info(bn::dmg_music_items::spooky_birthday, false, nullptr, "spooky birthday", "copyrat90", {},
+    tune_info(bn::dmg_music_items::spooky_birthday, tune_info::category::ORIGINAL, false, nullptr, "spooky birthday",
+              "copyrat90", {},
               R"(Spooky birthday jingle for my GBA Microjam '23 entry:
 Light the candles on the halloween cake!
 https://github.com/gbadev-org/microjam23)"),
