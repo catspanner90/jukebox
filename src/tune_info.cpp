@@ -58,6 +58,16 @@ static_assert(std::ranges::all_of(TUNES_LIST,
                                   }),
               "Thumbnail too big");
 
+static_assert(
+    [] {
+        for (int l = 0; l < TUNES_LIST.size() - 1; ++l)
+            for (int r = l + 1; r < TUNES_LIST.size(); ++r)
+                if (&TUNES_LIST[l] == &TUNES_LIST[r])
+                    return false;
+        return true;
+    }(),
+    "Duplicated tune");
+
 } // namespace
 
 auto tune_info::tunes_list() -> bn::span<const tune_info>
