@@ -8,6 +8,7 @@
 
 #include "bn_dmg_music_items_hell_owo_rld.h"
 #include "bn_dmg_music_items_puku_7.h"
+#include "bn_dmg_music_items_safer_with_you.h"
 #include "bn_dmg_music_items_spooky_birthday.h"
 
 namespace jb
@@ -32,6 +33,8 @@ Original song also has PCM channels, but unfortunately, they're missing in this 
               R"(Spooky birthday jingle for my GBA Microjam '23 entry:
 Light the candles on the halloween cake!
 https://github.com/gbadev-org/microjam23)"),
+    tune_info(bn::dmg_music_items::safer_with_you, tune_info::category::TRANSCRIBE, false, nullptr, "Safer with You",
+              "valfrey", "copyrat90", R"(I wonder what happened to this game and the composer...)"),
 };
 
 constexpr bn::span<const tune_info> TUNES_LIST(TUNES_LIST_RAW);
