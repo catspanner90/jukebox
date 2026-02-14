@@ -2,6 +2,7 @@
 
 #include "scn/scene_context.h"
 #include "tune_info.h"
+#include "ui/menu_navigator_builder.h"
 
 #include <bn_colors.h>
 #include <bn_display.h>
@@ -9,7 +10,6 @@
 #include <bn_dmg_music_item.h>
 #include <bn_dp_direct_bitmap_bg_builder.h>
 #include <bn_fixed_point.h>
-#include <bn_keypad.h>
 #include <bn_sstream.h>
 #include <bn_string.h>
 
@@ -31,7 +31,7 @@ constexpr int BG_SIZE = bn::bitmap_bg::dp_direct_height();
 constexpr bn::fixed LEFT_BTN_X = 137;
 constexpr bn::fixed RIGHT_BTN_X = 197;
 constexpr bn::fixed TOP_BTN_Y = 133;
-constexpr bn::fixed BOTTOM_BTN_Y = 148;
+constexpr bn::fixed BOTTOM_BTN_Y = 150;
 
 auto create_bg_painter() -> bn::dp_direct_bitmap_bg_painter
 {
@@ -41,14 +41,9 @@ auto create_bg_painter() -> bn::dp_direct_bitmap_bg_painter
 
 } // namespace
 
-jukebox::jukebox(scene_context& ctx) : scene(ctx)
+jukebox::jukebox(scene_context& ctx) : scene(ctx), _tunes_navigator(init_tunes_navigator())
 {
     bn::dmg_music::set_master_volume(bn::dmg_music_master_volume::FULL);
-
-    // Fix out-of-bound tune index
-    if (cursor_index() >= static_cast<unsigned>(tune_info::tunes_list().size()))
-        set_cursor_index(0);
-
     play_at_cursor();
 
     uncover();
@@ -71,19 +66,11 @@ bool jukebox::update()
     switch (_state)
     {
     case state::TUNE_LIST:
-        if (bn::keypad::b_pressed())
-            stop();
-
-        if (bn::keypad::a_pressed())
-        {
-            if (!_playing_index.has_value() || _playing_index.value() != cursor_index())
-                play_at_cursor();
-            else
-                pause_or_resume();
-        }
+        _tunes_navigator.update();
         break;
 
     case state::TUNE_INFO:
+        // TODO
         break;
 
     default:
@@ -165,10 +152,16 @@ void jukebox::set_cursor_index(unsigned index)
 
     config_save.set_tune_index(index);
     config_save.save();
+
+    redraw_thumbnail_bg();
+    redraw_a_texts();
 }
 
 void jukebox::redraw_thumbnail_bg()
 {
+    if (!_bg_painter.has_value())
+        return;
+
     // Clear bg (excluding borders)
     _bg_painter->unsafe_rectangle(2, 2, BG_SIZE - 3, BG_SIZE - 3, bn::colors::black);
 
@@ -224,7 +217,7 @@ void jukebox::redraw_tune_head_texts()
     text_gens.set_text_color(SMALL_FONT, LIGHT_GRAY);
 
     static constexpr bn::fixed_point TUNE_NAME_POS(1, 1);
-    static constexpr bn::fixed_point COMPOSER_NAME_POS(15, 14);
+    static constexpr bn::fixed_point COMPOSER_NAME_POS(15, 16);
 
     const tune_info& info = tune_info::tunes_list()[_playing_index.value()];
 
@@ -334,7 +327,52 @@ void jukebox::redraw_start_texts()
 
 void jukebox::redraw_tune_list_texts()
 {
-    // TODO
+    _tunes_navigator.reserve_refresh_page();
+}
+
+void jukebox::on_tunes_navigator_pointed_changed([[maybe_unused]] unsigned prev_page,
+                                                 [[maybe_unused]] unsigned prev_pointed_index,
+                                                 [[maybe_unused]] unsigned new_page, unsigned new_pointed_index)
+{
+    set_cursor_index(new_pointed_index);
+}
+
+void jukebox::on_tunes_navigator_activated(unsigned menu_index)
+{
+    BN_ASSERT(cursor_index() == menu_index);
+
+    if (!_playing_index.has_value() || _playing_index.value() != cursor_index())
+        play_at_cursor();
+    else
+        pause_or_resume();
+}
+
+void jukebox::on_tunes_navigator_cancelled()
+{
+    stop();
+}
+
+auto jukebox::init_tunes_navigator() -> ui::menu_navigator
+{
+    // Fix out-of-bound tune index
+    if (cursor_index() >= static_cast<unsigned>(tune_info::tunes_list().size()))
+        set_cursor_index(0);
+
+    return ui::menu_navigator_builder(sys::text_generators::font::GALMURI_7, tune_info::tunes_names_list(),
+                                      _list_text_sprites)
+        .set_pointed_index(cursor_index())
+        .set_max_lines(ui::menu_navigator::MAX_MENUS_COUNT)
+        .set_line_margin(4)
+        .set_scroll_start_delay(20)
+        .set_scroll_continue_delay(5)
+        .set_top_left_position(bn::fixed_point(LEFT_BTN_X, BG_POS.y()))
+        .set_pointed_changed_callback(
+            [this](unsigned prev_page, unsigned prev_pointed_index, unsigned new_page, unsigned new_pointed_index) {
+                on_tunes_navigator_pointed_changed(prev_page, prev_pointed_index, new_page, new_pointed_index);
+            })
+        .set_activated_callback([this](unsigned menu_index) { on_tunes_navigator_activated(menu_index); })
+        .set_cancelled_callback([this] { on_tunes_navigator_cancelled(); })
+        .build(context().text_generators());
 }
 
 } // namespace jb::scn

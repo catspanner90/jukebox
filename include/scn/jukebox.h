@@ -2,6 +2,8 @@
 
 #include "scn/scene.h"
 
+#include "ui/menu_navigator.h"
+
 #include <bn_dp_direct_bitmap_bg_painter.h>
 #include <bn_optional.h>
 #include <bn_sprite_ptr.h>
@@ -50,6 +52,14 @@ private:
     void redraw_tune_list_texts();
 
 private:
+    void on_tunes_navigator_pointed_changed(unsigned prev_page, unsigned prev_pointed_index, unsigned new_page, unsigned new_pointed_index);
+    void on_tunes_navigator_activated(unsigned menu_index);
+    void on_tunes_navigator_cancelled();
+
+private:
+    auto init_tunes_navigator() -> ui::menu_navigator;
+
+private:
     state _state = state::TUNE_LIST;
 
     bn::optional<unsigned> _playing_index;
@@ -63,6 +73,8 @@ private:
     bn::vector<bn::sprite_ptr, 2> _start_text_sprites;
 
     bn::vector<bn::sprite_ptr, 96> _list_text_sprites;
+
+    ui::menu_navigator _tunes_navigator;
 };
 
 } // namespace jb::scn
