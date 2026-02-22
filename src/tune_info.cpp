@@ -33,7 +33,7 @@ Original song also has PCM channels, but unfortunately, they're missing in this 
               R"(Spooky birthday jingle for my GBA Microjam '23 entry:
 Light the candles on the halloween cake!
 https://github.com/gbadev-org/microjam23)"),
-    tune_info(bn::dmg_music_items::safer_with_you, tune_info::category::TRANSCRIBE, false, nullptr, "Safer with You",
+    tune_info(bn::dmg_music_items::safer_with_you, tune_info::category::TRANSCRIBE, true, nullptr, "Safer with You",
               "valfrey", "copyrat90", R"(I wonder what happened to this game and the composer...)"),
 };
 
