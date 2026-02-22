@@ -23,7 +23,7 @@ int main()
         scene_stack.update();
         scene_context.transitions().update();
 
-        IBN_STATS_UPDATE;
         bn::core::update();
+        IBN_STATS_UPDATE;
     }
 }

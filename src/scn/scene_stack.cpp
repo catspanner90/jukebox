@@ -1,5 +1,9 @@
 #include "scn/scene_stack.h"
 
+#include "ibn_stats.h"
+
+#include <bn_core.h>
+
 namespace jb::scn
 {
 
@@ -13,47 +17,82 @@ void scene_stack::update()
             break;
     }
 
-    // Apply reserves
-    for (int i = 0; i < _reserved.size(); ++i)
+    // Apply reserved changes
+    for (auto& reserved : _reserved_changes)
     {
-        auto& reserved = _reserved[i];
-        const bn::type_id_t reserved_type = _reserved_types[i];
-
-        // If not empty, it's a push
-        if (reserved)
+        switch (reserved.change_kind)
         {
-            // Apply pushes
+        case reserved_change::kind::PUSH:
+            // Previous top scene is `cover()`ed first
             if (!_scenes.empty())
-                _scenes.back()->cover(reserved_type);
+                _scenes.back()->cover(reserved.new_scene_type);
 
-            // Construct the reserved scene
-            _scenes.push_back(reserved(*this));
-        }
-        // If empty, it's a pop
-        else
-        {
-            // Apply pops
+            if (reserved.delay_frame)
+            {
+                bn::core::update();
+                IBN_STATS_UPDATE;
+            }
+
+            _scenes.push_back(reserved.new_scene_factory(*this));
+            break;
+
+        case reserved_change::kind::POP:
             _scenes.pop_back();
 
+            if (reserved.delay_frame)
+            {
+                bn::core::update();
+                IBN_STATS_UPDATE;
+            }
+
+            // Next top scene is `uncover()`ed last
             if (!_scenes.empty())
                 _scenes.back()->uncover();
+            break;
+
+        case reserved_change::kind::REPLACE_TOP:
+            // Avoids `uncover()` & `cover()` overhead
+            if (!_scenes.empty())
+                _scenes.pop_back();
+
+            if (reserved.delay_frame)
+            {
+                bn::core::update();
+                IBN_STATS_UPDATE;
+            }
+
+            _scenes.push_back(reserved.new_scene_factory(*this));
+            break;
+
+        case reserved_change::kind::CLEAR:
+            // Avoids `uncover()` overhead
+            while (!_scenes.empty())
+                _scenes.pop_back();
+            break;
+
+        default:
+            BN_ERROR("Invalid reserved_change::kind : ", (int)reserved.change_kind);
         }
     }
-    _reserved.clear();
-    _reserved_types.clear();
+    _reserved_changes.clear();
 }
 
 void scene_stack::reserve_pop()
 {
-    // Empty `function` instance means pop
-    _reserved.emplace_back(nullptr);
-    _reserved_types.push_back(bn::type_id_t{});
+    _reserved_changes.emplace_back(reserved_change::kind::POP, false, bn::type_id_t{},
+                                   reserved_change::new_scene_factory_t{});
+}
+
+void scene_stack::reserve_pop_with_delay()
+{
+    _reserved_changes.emplace_back(reserved_change::kind::POP, true, bn::type_id_t{},
+                                   reserved_change::new_scene_factory_t{});
 }
 
 void scene_stack::reserve_clear()
 {
-    for (int i = 0; i < _scenes.size(); ++i)
-        reserve_pop();
+    _reserved_changes.emplace_back(reserved_change::kind::CLEAR, false, bn::type_id_t{},
+                                   reserved_change::new_scene_factory_t{});
 }
 
 } // namespace jb::scn

@@ -81,15 +81,13 @@ bool licenses_list::update()
     {
         auto& scene_stack = context().stack();
 
-        scene_stack.reserve_pop();
-        scene_stack.reserve_push<license_print>(_cursor_idx, context());
+        scene_stack.reserve_replace_top<license_print>(_cursor_idx, context());
     }
     else if (bn::keypad::b_pressed())
     {
         auto& scene_stack = context().stack();
 
-        scene_stack.reserve_pop();
-        scene_stack.reserve_push<jukebox>(context());
+        scene_stack.reserve_pop_with_delay();
     }
 
     return false;
