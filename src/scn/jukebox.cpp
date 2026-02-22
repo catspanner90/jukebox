@@ -1,6 +1,8 @@
 #include "scn/jukebox.h"
 
+#include "scn/licenses_list.h"
 #include "scn/scene_context.h"
+#include "scn/scene_stack.h"
 #include "tune_info.h"
 #include "ui/menu_navigator_builder.h"
 
@@ -10,6 +12,7 @@
 #include <bn_dmg_music_item.h>
 #include <bn_dp_direct_bitmap_bg_builder.h>
 #include <bn_fixed_point.h>
+#include <bn_keypad.h>
 #include <bn_sstream.h>
 #include <bn_string.h>
 
@@ -67,6 +70,10 @@ bool jukebox::update()
     {
     case state::TUNE_LIST:
         _tunes_navigator.update();
+
+        if (bn::keypad::select_pressed())
+            context().stack().reserve_push_with_delay<licenses_list>(0, context());
+
         break;
 
     case state::TUNE_INFO:
@@ -87,8 +94,8 @@ void jukebox::cover(bn::type_id_t)
     _tune_head_text_sprites.clear();
     _a_text_sprites.clear();
     _b_text_sprites.clear();
-    _lr_text_sprites.clear();
     _start_text_sprites.clear();
+    _select_text_sprites.clear();
     _list_text_sprites.clear();
 }
 
@@ -102,8 +109,8 @@ void jukebox::uncover()
     redraw_tune_head_texts();
     redraw_a_texts();
     redraw_b_texts();
-    redraw_lr_texts();
     redraw_start_texts();
+    redraw_select_texts();
 
     redraw_tune_list_texts();
 }
@@ -166,7 +173,6 @@ void jukebox::redraw_thumbnail_bg()
     _bg_painter->unsafe_rectangle(2, 2, BG_SIZE - 3, BG_SIZE - 3, bn::colors::black);
 
     // Draw thumbnail
-    // TODO: Zoom thumbnail
     const tune_info& info = tune_info::tunes_list()[cursor_index()];
     const bn::direct_bitmap_item& raw_bitmap_item =
         info.thumbnail() ? *info.thumbnail() : bn::direct_bitmap_items::no_thumbnail;
@@ -298,18 +304,6 @@ void jukebox::redraw_b_texts()
     [[maybe_unused]] bool generated = text_gen.generate_top_left_optional(TEXT_POS, text, _b_text_sprites);
 }
 
-void jukebox::redraw_lr_texts()
-{
-    _lr_text_sprites.clear();
-
-    auto& text_gen = context().text_generators().get(sys::text_generators::font::GALMURI_7);
-
-    static constexpr bn::fixed_point TEXT_POS(LEFT_BTN_X, BOTTOM_BTN_Y);
-    static constexpr bn::string_view TEXT = " Zoom";
-
-    [[maybe_unused]] bool generated = text_gen.generate_top_left_optional(TEXT_POS, TEXT, _lr_text_sprites);
-}
-
 void jukebox::redraw_start_texts()
 {
     _start_text_sprites.clear();
@@ -318,11 +312,23 @@ void jukebox::redraw_start_texts()
     {
         auto& text_gen = context().text_generators().get(sys::text_generators::font::GALMURI_7);
 
-        static constexpr bn::fixed_point TEXT_POS(RIGHT_BTN_X, BOTTOM_BTN_Y);
+        static constexpr bn::fixed_point TEXT_POS(LEFT_BTN_X, BOTTOM_BTN_Y);
         static constexpr bn::string_view TEXT = " Info";
 
         [[maybe_unused]] bool generated = text_gen.generate_top_left_optional(TEXT_POS, TEXT, _start_text_sprites);
     }
+}
+
+void jukebox::redraw_select_texts()
+{
+    _select_text_sprites.clear();
+
+    auto& text_gen = context().text_generators().get(sys::text_generators::font::GALMURI_7);
+
+    static constexpr bn::fixed_point TEXT_POS(RIGHT_BTN_X, BOTTOM_BTN_Y);
+    static constexpr bn::string_view TEXT = " License";
+
+    [[maybe_unused]] bool generated = text_gen.generate_top_left_optional(TEXT_POS, TEXT, _select_text_sprites);
 }
 
 void jukebox::redraw_tune_list_texts()

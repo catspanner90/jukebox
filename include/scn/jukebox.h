@@ -46,8 +46,8 @@ private:
     void redraw_tune_head_texts();
     void redraw_a_texts();
     void redraw_b_texts();
-    void redraw_lr_texts();
     void redraw_start_texts();
+    void redraw_select_texts();
 
     void redraw_tune_list_texts();
 
@@ -69,8 +69,8 @@ private:
     bn::vector<bn::sprite_ptr, 24> _tune_head_text_sprites;
     bn::vector<bn::sprite_ptr, 2> _a_text_sprites;
     bn::vector<bn::sprite_ptr, 2> _b_text_sprites;
-    bn::vector<bn::sprite_ptr, 2> _lr_text_sprites;
     bn::vector<bn::sprite_ptr, 2> _start_text_sprites;
+    bn::vector<bn::sprite_ptr, 2> _select_text_sprites;
 
     bn::vector<bn::sprite_ptr, 96> _list_text_sprites;
 
