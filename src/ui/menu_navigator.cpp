@@ -253,6 +253,8 @@ void menu_navigator::commit_refresh_page()
     // Render new sprite texts.
     bool failed = false;
     const auto prev_pal = _text_gen.palette_item();
+    const auto prev_bg_priority = _text_gen.bg_priority();
+    _text_gen.set_bg_priority(_bg_priority);
     for (unsigned line = 0; line < get_max_lines_for_index(_pointed_index); ++line)
     {
         const unsigned idx = page * _max_lines + line;
@@ -274,12 +276,9 @@ void menu_navigator::commit_refresh_page()
         render_texts(_menu_strings_2);
     }
     _text_gen.set_palette_item(prev_pal);
+    _text_gen.set_bg_priority(prev_bg_priority);
 
     _menu_spr_start_idxes.push_back(_output_sprites.size());
-
-    // Set bg priority of new sprites.
-    for (int idx = _init_output_sprites_size; idx < _output_sprites.size(); ++idx)
-        _output_sprites[idx].set_bg_priority(_bg_priority);
 
     if (failed)
         BN_LOG_LEVEL(bn::log_level::WARN, "Failed generating text sprites for `menu_navigator`");
