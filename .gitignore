@@ -7,9 +7,6 @@
 .venv/
 __pycache__/
 
-# music build output
-*.vgm
-
 # build output
 build*/
 *.elf

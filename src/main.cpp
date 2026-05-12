@@ -6,10 +6,13 @@
 #include <bn_colors.h>
 #include <bn_common.h>
 #include <bn_core.h>
+#include <bn_dmg_music.h>
 
 int main()
 {
     bn::core::init(bn::colors::black);
+
+    bn::dmg_music::set_master_volume(bn::dmg_music_master_volume::FULL);
 
     static BN_DATA_EWRAM jb::scn::scene_stack scene_stack;
     static BN_DATA_EWRAM jb::scn::scene_context scene_context(scene_stack);

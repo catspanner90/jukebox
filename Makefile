@@ -14,6 +14,8 @@
 # AUDIOTOOL is the path to the tool used process the audio files.
 # DMGAUDIO is a list of files and directories containing files to be processed by the DMG audio backend.
 # DMGAUDIOBACKEND specifies the backend used for DMG audio playback. Supported backends: default, null.
+# DMGAUDIOSYNC enables synchronization of audio and DMG audio playback when it is not empty.
+#     Keep in mind that you can't use link cable features with this enabled.
 # ROMTITLE is a uppercase ASCII, max 12 characters text string containing the output ROM title.
 # ROMCODE is a uppercase ASCII, max 4 characters text string containing the output ROM code.
 # USERFLAGS is a list of additional compiler flags:
@@ -50,13 +52,14 @@ FONTS       	:=  $(LIBGBAKORFONTS)/fonts/galmuri7 $(LIBGBAKORFONTS)/fonts/galmur
 TEXTS       	:=  $(LICENSES)
 GRAPHICS    	:=  graphics graphics/bg graphics/spr graphics/pal graphics/tile $(BUILDFONTS)/fonts
 AUDIO       	:=  audio
-AUDIOBACKEND	:=  null
+AUDIOBACKEND	:=  maxmod
 AUDIOTOOL   	:=  
 DMGAUDIO    	:=  dmg_audio
 DMGAUDIOBACKEND	:=  default
+DMGAUDIOSYNC	:=  true
 ROMTITLE    	:=  JUKEBOX
 ROMCODE     	:=  2JBE
-USERFLAGS   	:=  
+USERFLAGS   	:=  -DBN_CFG_AUDIO_MIXING_RATE=BN_AUDIO_MIXING_RATE_31_KHZ
 USERCXXFLAGS	:=  
 USERASFLAGS 	:=  
 USERLDFLAGS 	:=  

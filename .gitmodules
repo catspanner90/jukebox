@@ -1,6 +1,6 @@
 [submodule "libs/butano"]
 	path = libs/butano
-	url = https://github.com/GValiente/butano.git
+	url = https://github.com/copyrat90/butano.git
 [submodule "libs/iso-butano"]
 	path = libs/iso-butano
 	url = https://github.com/copyrat90/iso-butano.git

@@ -8,8 +8,6 @@
 
 #include <bn_colors.h>
 #include <bn_display.h>
-#include <bn_dmg_music.h>
-#include <bn_dmg_music_item.h>
 #include <bn_dp_direct_bitmap_bg_builder.h>
 #include <bn_fixed_point.h>
 #include <bn_keypad.h>
@@ -46,7 +44,6 @@ auto create_bg_painter() -> bn::dp_direct_bitmap_bg_painter
 
 jukebox::jukebox(scene_context& ctx) : scene(ctx), _tunes_navigator(init_tunes_navigator())
 {
-    bn::dmg_music::set_master_volume(bn::dmg_music_master_volume::FULL);
     play_at_cursor();
 
     uncover();
@@ -54,12 +51,12 @@ jukebox::jukebox(scene_context& ctx) : scene(ctx), _tunes_navigator(init_tunes_n
 
 jukebox::~jukebox()
 {
-    bn::dmg_music::stop();
+    tune_info::stop();
 }
 
 bool jukebox::update()
 {
-    if (_playing_index.has_value() && !bn::dmg_music::playing())
+    if (_playing_index.has_value() && !tune_info::playing())
     {
         _playing_index.reset();
         redraw_tune_head_texts();
@@ -118,7 +115,7 @@ void jukebox::uncover()
 void jukebox::play_at_cursor()
 {
     const tune_info& info = tune_info::tunes_list()[cursor_index()];
-    info.tune().play(1, info.loop());
+    info.play();
 
     _playing_index = cursor_index();
 
@@ -128,10 +125,10 @@ void jukebox::play_at_cursor()
 
 void jukebox::pause_or_resume()
 {
-    if (bn::dmg_music::paused())
-        bn::dmg_music::resume();
+    if (tune_info::paused())
+        tune_info::resume();
     else
-        bn::dmg_music::pause();
+        tune_info::pause();
 
     redraw_a_texts();
 }
@@ -140,7 +137,7 @@ void jukebox::stop()
 {
     if (_playing_index.has_value())
     {
-        bn::dmg_music::stop();
+        tune_info::stop();
         _playing_index.reset();
 
         redraw_tune_head_texts();
@@ -286,8 +283,8 @@ void jukebox::redraw_a_texts()
     const bn::string_view text = _state == state::TUNE_INFO ? " Next"
                                  : (!_playing_index.has_value() || _playing_index.value() != cursor_index())
                                      ? " Play"
-                                 : bn::dmg_music::paused() ? " Resume"
-                                                           : " Pause";
+                                 : tune_info::paused() ? " Resume"
+                                                       : " Pause";
 
     [[maybe_unused]] bool generated = text_gen.generate_top_left_optional(TEXT_POS, text, _a_text_sprites);
 }

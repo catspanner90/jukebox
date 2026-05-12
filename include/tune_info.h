@@ -8,6 +8,7 @@
 namespace bn
 {
 class dmg_music_item;
+class music_item;
 class direct_bitmap_item;
 } // namespace bn
 
@@ -29,17 +30,28 @@ public:
     static auto tunes_names_list() -> bn::span<const bn::string_view>;
 
 public:
-    constexpr tune_info(const bn::dmg_music_item& tune, category category_, bool loop,
+    constexpr tune_info(const bn::dmg_music_item* dmg_mus, const bn::music_item* mus, category category_, bool loop,
                         const bn::direct_bitmap_item* thumbnail, const bn::string_view& tune_name,
                         const bn::string_view& composer_name, const bn::string_view& remixer_name,
                         const bn::string_view& description)
-        : _tune(tune), _category(category_), _loop(loop), _thumbnail(thumbnail), _tune_name(tune_name),
+        : _dmg_mus(dmg_mus), _mus(mus), _category(category_), _loop(loop), _thumbnail(thumbnail), _tune_name(tune_name),
           _composer_name(composer_name), _remixer_name(remixer_name), _description(description)
     {
+        BN_ASSERT(dmg_mus || mus, "No tune item provided");
     }
 
+public:
+    static bool playing();
+    static bool paused();
+
+    void play() const;
+    static void stop();
+    static void pause();
+    static void resume();
+
 private:
-    const bn::dmg_music_item& _tune;
+    const bn::dmg_music_item* _dmg_mus;
+    const bn::music_item* _mus;
     category _category;
     bool _loop;
     const bn::direct_bitmap_item* _thumbnail;
@@ -49,9 +61,14 @@ private:
     bn::string_view _description;
 
 public:
-    constexpr auto tune() const -> decltype(_tune)
+    constexpr auto dmg_mus() const -> decltype(_dmg_mus)
     {
-        return _tune;
+        return _dmg_mus;
+    }
+
+    constexpr auto mus() const -> decltype(_mus)
+    {
+        return _mus;
     }
 
     constexpr auto category() const -> decltype((_category))
